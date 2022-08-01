@@ -1,0 +1,31 @@
+#+title: Specification
+
+This is how the configuration works
+#+begin_src yaml
+config:
+  port: 8080
+  services:
+    - endpoint: /simplemail
+      email: something@gmail.com
+      cred-env: SOMETHING
+      default-dest:
+        - something@gmail
+      default-cc:
+        - cc@gmail.com
+      body-format: {body}
+#+end_src
+The credentials will be written in .env
+
+The request to the endpoint will be a post request and the body will look like this 
+#+begin_src json
+{
+"from": "email@emailprovider.com",
+"subject": "subject of email",
+"cc" : []
+"dest": []
+"bcc": []
+"body": ""
+}
+#+end_src
+
+https://github.com/jordan-wright/email
