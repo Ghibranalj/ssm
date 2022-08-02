@@ -1,0 +1,40 @@
+#+title: http request test
+#+FILETAGS: :verb:
+
+#eval: (verb-mode)
+* Simple test
+post http://localhost:8080/test
+accept: application/json
+
+{
+    "subject" : "ghibran",
+    "body" : "tolol",
+    "name" : "joking",
+}
+
+* With BCC and CC
+post http://localhost:8080/test
+accept: application/json
+
+#+begin_src json
+{
+  "subject": "ghibran",
+  "cc": "abc@gmail.com",
+  "bcc": "def@gmail.com",
+  "body": "something else is greaat",
+  "name": "ghibran",
+}
+#+end_src
+
+* With to
+post http://localhost:8080/test
+accept: application/json
+
+#+begin_src json
+{
+  "subject": "ghibran",
+  "name": "ghibran",
+  "body": "this is a test which is great",
+  "to": "1@gmail.com, 2@gmail.com"
+}
+#+end_src

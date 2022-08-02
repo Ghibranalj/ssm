@@ -21,10 +21,11 @@ type Service struct {
 	Email        string   `yaml:"email"`
 	Env          string   `yaml:"env"`
 	Destinations []string `yaml:"destinations"`
-	Bc           []string `yaml:"cc"`
-	Bcc          []string `yaml:"bcc"`
+	CC           []string `yaml:"cc"`
+	BCC          []string `yaml:"bcc"`
 	BodyFormat   string   `yaml:"bodyFormat"`
-	Cors         []string `yaml:"cors"`
+	Cors         string   `yaml:"cors"`
+	SmtpServer   string   `yaml:"smtpServer"`
 }
 
 type Config struct {
@@ -86,12 +87,13 @@ func init() {
 func GenerateEndpoint(service Service) {
 
 	endpoint := service.Endpoint
-	corsString := strings.Join(service.Cors, ",")
+	corsString := service.Cors
 
 	// TODO get the body format from the config & get the field names
 
 	bodyTemplate := template.New("body")
 	bodyTemplate, err := bodyTemplate.Parse(service.BodyFormat)
+	pass := os.Getenv(service.Env)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing body format in service %s: %v\n", service.Endpoint, err)
@@ -114,14 +116,30 @@ func GenerateEndpoint(service Service) {
 		log.Printf("Received request: %v\n", data)
 
 		sb := &strings.Builder{}
-		err = bodyTemplate.Execute(sb, data)
-		if err != nil {
-			log.Printf("Error executing template: %v\n", err)
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintf(w, "Error executing template: %s\n", err.Error())
-			return
+		bodyTemplate.Execute(sb, data)
+
+		dest := service.Destinations
+		if va, ok := data["to"]; ok {
+			dest = strings.Split(va.(string), ",")
 		}
-		log.Printf("Sending email: %s\n", sb.String())
+		cc := service.CC
+		if va, ok := data["cc"]; ok {
+			cc = strings.Split(va.(string), ",")
+		}
+		bcc := service.BCC
+		if va, ok := data["bcc"]; ok {
+			bcc = strings.Split(va.(string), ",")
+		}
+		e := Email{
+			To:      dest,
+			From:    service.Email,
+			Subject: data["subject"].(string),
+			Body:    sb.String(),
+			CC:      cc,
+			BCC:     bcc,
+		}
+		e.Send(pass, service.SmtpServer)
+
 	}).Methods("POST")
 
 	log.Printf("Endpoint %s created succesfully\n", endpoint)
