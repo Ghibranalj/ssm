@@ -17,15 +17,15 @@ import (
 )
 
 type Service struct {
-	Endpoint     string   `yaml:"endpoint"`
-	Email        string   `yaml:"email"`
-	Env          string   `yaml:"env"`
-	Destinations []string `yaml:"destinations"`
-	CC           []string `yaml:"cc"`
-	BCC          []string `yaml:"bcc"`
-	BodyFormat   string   `yaml:"bodyFormat"`
-	Cors         string   `yaml:"cors"`
-	SmtpServer   string   `yaml:"smtpServer"`
+	Endpoint   string   `yaml:"endpoint"`
+	Email      string   `yaml:"email"`
+	Env        string   `yaml:"env"`
+	To         []string `yaml:"to"`
+	CC         []string `yaml:"cc"`
+	BCC        []string `yaml:"bcc"`
+	BodyFormat string   `yaml:"bodyFormat"`
+	Cors       string   `yaml:"cors"`
+	SmtpServer string   `yaml:"smtpServer"`
 }
 
 type Config struct {
@@ -43,6 +43,15 @@ var (
 	router *mux.Router
 )
 
+func init() {
+	confFile := flag.String("c", "config.yml", "config file")
+	envFile := flag.String("e", ".env", "env file")
+
+	flag.Parse()
+	opts.configFile = *confFile
+	opts.envFile = *envFile
+}
+
 func main() {
 	file, err := ioutil.ReadFile(opts.configFile)
 	if err != nil {
@@ -59,7 +68,7 @@ func main() {
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading .env file: %v\n", err)
-		os.Exit(1)
+		log.Println("Not loading .env file")
 	}
 
 	router = mux.NewRouter()
@@ -75,30 +84,19 @@ func main() {
 		os.Exit(1)
 	}
 }
-func init() {
-	confFile := flag.String("c", "config.yml", "config file")
-	envFile := flag.String("e", ".env", "env file")
-
-	flag.Parse()
-	opts.configFile = *confFile
-	opts.envFile = *envFile
-}
 
 func GenerateEndpoint(service Service) {
 
 	endpoint := service.Endpoint
 	corsString := service.Cors
-
-	// TODO get the body format from the config & get the field names
-
 	bodyTemplate := template.New("body")
 	bodyTemplate, err := bodyTemplate.Parse(service.BodyFormat)
-	pass := os.Getenv(service.Env)
-
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing body format in service %s: %v\n", service.Endpoint, err)
 		os.Exit(1)
 	}
+
+	pass := os.Getenv(service.Env)
 
 	router.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", corsString)
@@ -113,22 +111,21 @@ func GenerateEndpoint(service Service) {
 			fmt.Fprintf(w, "Error parsing body: %s\n", err.Error())
 			return
 		}
-		log.Printf("Received request: %v\n", data)
 
 		sb := &strings.Builder{}
 		bodyTemplate.Execute(sb, data)
 
-		dest := service.Destinations
-		if va, ok := data["to"]; ok {
-			dest = strings.Split(va.(string), ",")
+		dest := service.To
+		if val, ok := data["to"]; ok {
+			dest = strings.Split(val.(string), ",")
 		}
 		cc := service.CC
-		if va, ok := data["cc"]; ok {
-			cc = strings.Split(va.(string), ",")
+		if val, ok := data["cc"]; ok {
+			cc = strings.Split(val.(string), ",")
 		}
 		bcc := service.BCC
-		if va, ok := data["bcc"]; ok {
-			bcc = strings.Split(va.(string), ",")
+		if val, ok := data["bcc"]; ok {
+			bcc = strings.Split(val.(string), ",")
 		}
 		e := Email{
 			To:      dest,
@@ -138,7 +135,13 @@ func GenerateEndpoint(service Service) {
 			CC:      cc,
 			BCC:     bcc,
 		}
-		e.Send(pass, service.SmtpServer)
+		err = e.Send(pass, service.SmtpServer)
+		if err != nil {
+			log.Printf("Error sending email: %v\n", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "Error sending email: %s\n", err.Error())
+			return
+		}
 
 	}).Methods("POST")
 

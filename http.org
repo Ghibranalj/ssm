@@ -38,3 +38,18 @@ accept: application/json
   "to": "1@gmail.com, 2@gmail.com"
 }
 #+end_src
+
+* With to, cc , and bcc
+post http://localhost:8080/test
+accept: application/json
+
+#+begin_src json
+{
+  "subject": "ghibran",
+  "name": "ghibran",
+  "body": "this is a test which is great",
+  "to": "1@gmail.com, 2@gmail.com"
+  "cc": "abc@gmail.com",
+  "bcc": "def@gmail.com",
+}
+#+end_src

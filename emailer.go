@@ -33,6 +33,8 @@ func (e *Email) toBytes() []byte {
 	return []byte(e.toString())
 }
 
-func (e *Email) Send(pass, server string) {
+func (e *Email) Send(pass, server string) error {
 	fmt.Println(e.toString())
+
+	return nil
 }
