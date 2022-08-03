@@ -62,11 +62,11 @@ accept: application/json
 
 #+begin_src json
 {
-  "subject": {{(ivy-read "Subject: " nil)}},
-  "name": {{(ivy-read "Name: " nil)}},
+  "subject": "{{(read-string "Subject: " )}}",
+  "name": "{{(read-string "Name: " nil)}}",
   "body": "this is a test which is great",
-  "cc": {{(ivy-read "CC: " nil)}},
-  "bcc": {{(ivy-read "BCC: " nil)}},
-  "to": {{(ivy-read "To: " nil)}}
+  "cc": "{{(ivy-read "CC: " nil)}}",
+  "bcc": "{{(ivy-read "BCC: " nil)}}",
+  "to": "{{(ivy-read "To: " nil)}}"
 }
 #+end_src
