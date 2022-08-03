@@ -18,7 +18,7 @@ Stupid Simple Mailer provides configurable email sender, with which you can make
         env: PW # Environment variable where your password is stored
         to: # default destination when not specified by request
             - ghibranresearch@gmail.com
-        # Format with wich the body of the email will be sent using go template
+        # Format with wich the body of the email that will be sent using go template
         bodyFormat: |
             {{.body}}
             {{.name}}, {{.email}}
