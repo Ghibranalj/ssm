@@ -1,31 +1,59 @@
-#+title: Specification
+#+title: Stupid Simple Mailer
 
-This is how the configuration works
-#+begin_src yaml
-config:
-  port: 8080
-  services:
-    - endpoint: /simplemail
-      email: something@gmail.com
-      cred-env: SOMETHING
-      default-dest:
-        - something@gmail
-      default-cc:
-        - cc@gmail.com
-      body-format: {body}
+Stupid Simple Mailer is a configurable email sender backend for your email form.
+
+*** Why?
+Often times if you want to make a simple email form for your portfolio site you'd need to make your own backend from scratch, which is a chore.
+Stupid Simple Mailer provides configurable email sender, with which you can make an email backend in less than 20 lines of yaml.
+
+
+*** How it works
+1. Configure
+   you need to provide configuration inside of src_sh[]{config.yml}.
+   #+begin_src yaml
+port: 8080
+services:
+      - endpoint: /test
+       email: example@gmail.com # email to send from
+       env: PW # Environment variable where your password is stored
+       to: # default destination when not specified by request
+         - ghibranresearch@gmail.com
+       # Format with wich the body of the email will be sent using go template
+       bodyFormat: |
+         {{.body}}
+         {{.name}}, {{.email}}
+       cors: "*" # Cors header
+       smtpServer: smtp.gmail.com # server
+       smtpPort: "587" # port
+       CC: # CC (optional)
+         - cc@gmail.com
+       BCC: # BCC (optional)
+         - bcc@gmail.com
+  ]
+   #+end_src
+
+2. Environment
+You can provide the environment variable by yourself, SSM can also read src_sh[]{.env} file.
+#+begin_src bash
+export PW=yourverysecretpassword
 #+end_src
-The credentials will be written in .env
-
-The request to the endpoint will be a post request and the body will look like this 
+3. Request
+Your Frontend can now send a request to your SSM backend.
+SSM will read the json body of the request.
+These are the default json field that SSM uses
 #+begin_src json
 {
-"from": "email@emailprovider.com",
-"subject": "subject of email",
-"cc" : []
-"dest": []
-"bcc": []
-"body": ""
+"subject": "the subject of the email",
+"to": "email@gmail.com, commaseperated@gmail.com",
+"bcc": "bcc@gmail.com",
+"cc": "cc@gmail.com"
 }
 #+end_src
+Furthermore, SSM will read theld that is required by your src_sh[]{bodyFormat} in the config.
+for example, the config above will read the fields src_sh[]{"body", "name", and "email"} and put it accordingly.
 
-https://github.com/jordan-wright/email
+
+*** BodyFormat
+Body will be the email body. This uses the go templating language. You can read more here: https://blog.gopheracademy.com/advent-2017/using-go-templates/
+The field names in the template will be read from the request body. You can name the field name whatever you want.
+In the examle above the fields src_sh[]{"body", "name", and "email"} will be read, and be put into the body.
