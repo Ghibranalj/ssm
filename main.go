@@ -128,10 +128,15 @@ func GenerateEndpoint(service Service) {
 		if val, ok := data["bcc"]; ok {
 			bcc = strings.Split(val.(string), ",")
 		}
+
+		s , ok := data["subject"]
+		if !ok {
+			s = "No subject"
+		}
 		e := Email{
 			To:      dest,
 			From:    service.Email,
-			Subject: data["subject"].(string),
+			Subject: s.(string),
 			Body:    sb.String(),
 			CC:      cc,
 			BCC:     bcc,
@@ -141,7 +146,7 @@ func GenerateEndpoint(service Service) {
 
 		if err != nil {
 			log.Printf("Error sending email: %v\n", err)
-			w.WriteHeader(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, "Error sending email: %s\n", err.Error())
 			return
 		}

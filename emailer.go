@@ -17,9 +17,10 @@ type Email struct {
 
 func (e *Email) toString() string {
 
-	to := strings.Join(e.To, ",")
-	cc := strings.Join(e.CC, ",")
-	bcc := strings.Join(e.BCC, ",")
+	to := trimAndJoin(e.To, ",")
+	cc := trimAndJoin(e.CC, ",")
+	bcc := trimAndJoin(e.BCC, ",")
+
 	return fmt.Sprintf(
 		`From: %s
 To: %s
@@ -42,4 +43,11 @@ func (e *Email) Send(pass, server, port string) error {
 		return err
 	}
 	return nil
+}
+
+func trimAndJoin(s []string, d string) string {
+	for i, v := range s {
+		s[i] = strings.TrimSpace(v)
+	}
+	return strings.Join(s, d)
 }
