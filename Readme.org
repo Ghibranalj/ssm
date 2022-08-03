@@ -8,7 +8,8 @@ Often times if you want to make a simple email form for your portfolio site you'
 Stupid Simple Mailer provides configurable email sender, with which you can make an email backend in less than 20 lines of yaml.
 *** How it works
 1. Configure
-   you need to provide configuration inside of `config.yml`.
+
+   You need to provide configuration inside of `config.yml`.
    #+begin_src yaml
     port: 8080
     services:
@@ -35,12 +36,14 @@ Stupid Simple Mailer provides configurable email sender, with which you can make
 
    Services is an array so you can make multiple endpoints
 2. Environment
+
     You can provide the environment variable by yourself, SSM can also read .env file.
     #+begin_src bash
     # either in .bashrc or .env
     export PW=yourverysecretpassword
     #+end_src
 3. Request
+
     Your Frontend can now send a request to your SSM backend.
     SSM will read the json body of the request.
     These are the default json field that SSM uses
