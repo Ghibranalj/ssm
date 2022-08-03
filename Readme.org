@@ -65,3 +65,20 @@ Body will be the email body. This uses the go templating language. You can read 
 
 The field names in the template will be read from the request body. You can name the field name whatever you want.
 In the examle above the fields "body", "name", and "email" will be read, and be put into the body.
+*** How to use
+**** Install
+***** From Source
+      #+begin_src bash
+      git clone https://github.com/Ghibranalj/ssm.git
+      cd ssm
+      go build .
+      #+end_src
+***** With go install
+#+begin_src bash
+     go install github.com/ghibranalj/ssm@latest
+#+end_src
+
+**** CLI
+#+begin_src bash
+ssm -c config.yml -e .env
+#+end_src
