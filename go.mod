@@ -1,4 +1,4 @@
-module github.com/ghibranalj/stupidsimplemailer
+module github.com/ghibranalj/ssm
 
 go 1.18
 
