@@ -47,12 +47,11 @@ accept: application/json
 
 #+begin_src json
 {
-  "subject": "ghibran",
   "name": "ghibran",
   "body": "this is a test which is great",
   "cc": "abc@gmail.com",
   "bcc": "def@gmail.com",
-  "to": "1@gmail.com, 2@gmail.com"
+  "to": "ghibranhosting@gmail.com, ghibranresearch@gmail.com"
 }
 #+end_src
 
@@ -63,10 +62,10 @@ accept: application/json
 #+begin_src json
 {
   "subject": "{{(read-string "Subject: " )}}",
-  "name": "{{(read-string "Name: " nil)}}",
-  "body": "this is a test which is great",
-  "cc": "{{(ivy-read "CC: " nil)}}",
-  "bcc": "{{(ivy-read "BCC: " nil)}}",
-  "to": "{{(ivy-read "To: " nil)}}"
+  "name": "{{(read-string "Name: ")}}",
+  "body": "{{(read-string "Body: ")}}",
+  "cc": "{{(read-string "CC: ")}}",
+  "bcc": "{{(read-string "BCC: ")}}",
+  "to": "{{(read-string "To: ")}}"
 }
 #+end_src

@@ -79,6 +79,9 @@ func main() {
 	http.Handle("/", router)
 
 	port := config.Port
+	if port == "" {
+		port = "8080"
+	}
 	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Server error: %v\n", err)
