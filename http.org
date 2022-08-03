@@ -6,11 +6,13 @@
 post http://localhost:8080/test
 accept: application/json
 
+#+begin_src json
 {
     "subject" : "ghibran",
     "body" : "tolol",
-    "name" : "joking",
+    "name" : "joking"
 }
+#+end_src
 
 * With BCC and CC
 post http://localhost:8080/test
@@ -22,7 +24,7 @@ accept: application/json
   "cc": "abc@gmail.com",
   "bcc": "def@gmail.com",
   "body": "something else is greaat",
-  "name": "ghibran",
+  "name": "ghibran"
 }
 #+end_src
 
@@ -39,7 +41,7 @@ accept: application/json
 }
 #+end_src
 
-* With to, cc , and bcc
+* With To, CC , and BCC
 post http://localhost:8080/test
 accept: application/json
 
@@ -48,8 +50,23 @@ accept: application/json
   "subject": "ghibran",
   "name": "ghibran",
   "body": "this is a test which is great",
-  "to": "1@gmail.com, 2@gmail.com"
   "cc": "abc@gmail.com",
   "bcc": "def@gmail.com",
+  "to": "1@gmail.com, 2@gmail.com"
+}
+#+end_src
+
+* With Input
+post http://localhost:8080/test
+accept: application/json
+
+#+begin_src json
+{
+  "subject": {{(ivy-read "Subject: " nil)}},
+  "name": {{(ivy-read "Name: " nil)}},
+  "body": "this is a test which is great",
+  "cc": {{(ivy-read "CC: " nil)}},
+  "bcc": {{(ivy-read "BCC: " nil)}},
+  "to": {{(ivy-read "To: " nil)}}
 }
 #+end_src

@@ -26,6 +26,7 @@ type Service struct {
 	BodyFormat string   `yaml:"bodyFormat"`
 	Cors       string   `yaml:"cors"`
 	SmtpServer string   `yaml:"smtpServer"`
+	SmtpPort   string   `yaml:"smtpPort"`
 }
 
 type Config struct {
@@ -135,13 +136,16 @@ func GenerateEndpoint(service Service) {
 			CC:      cc,
 			BCC:     bcc,
 		}
-		err = e.Send(pass, service.SmtpServer)
+
+		err = e.Send(pass, service.SmtpServer, service.SmtpPort)
+
 		if err != nil {
 			log.Printf("Error sending email: %v\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprintf(w, "Error sending email: %s\n", err.Error())
 			return
 		}
+		log.Println("Email sent")
 
 	}).Methods("POST")
 
